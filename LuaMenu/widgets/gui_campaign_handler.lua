@@ -48,6 +48,7 @@ local PLANET_NO_START_COLOR = {0.5, 0.5, 0.5, 1}
 
 local TARGET_IMAGE = LUA_DIRNAME .. "images/niceCircle.png"
 local IMG_LINK     = LUA_DIRNAME .. "images/link.png"
+local PARTY_LINK     = LUA_DIRNAME .. "images/partyinvite.png"
 
 local REWARD_ICON_SIZE = 58
 local DEBUG_UNLOCK_SIZE = 26
@@ -731,20 +732,31 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 		children = fluffLabels,
 	}
 
-	local planetDesc = TextBox:New {
-		x = 8,
-		y = "30%",
-		right = 4,
-		bottom = "25%",
-		text = planetData.infoDisplay.text,
-		font = Configuration:GetFont(3),
-	}
-
+	local planetDesc
+	if startable or Configuration.debugMode then
+		planetDesc = TextBox:New {
+			x = 20,
+			y = "25%",
+			right = 4,
+			bottom = "25%",
+			text = planetData.infoDisplay.text,
+			font = Configuration:GetFont(3),
+		}
+	else
+		planetDesc = TextBox:New {
+			x = 20,
+			y = "25%",
+			right = 4,
+			bottom = "25%",
+			text = "This planet will need to be approached for further study.",
+			font = Configuration:GetFont(3),
+		}	
+	end
 	local subPanel = Panel:New{
 		parent = starmapInfoPanel,
 		x = "3%",
 		y = "4%",
-		right = "50%",
+		right = "60%",
 		bottom = "4%",
 		children = {
 			nameLabel,
@@ -764,6 +776,7 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 		parent = starmapInfoPanel,
 	}
 
+	local btnInviteFriends
 	if startable then
 		if planetData.infoDisplay.feedbackLink then
 			MakeFeedbackButton(buttonHolder, planetData.infoDisplay.feedbackLink, nil, 2, 85, nil)
@@ -786,13 +799,14 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 		}
 
 		if Configuration.canAuthenticateWithSteam then
-			local btnInviteFriends = Button:New {
+			btnInviteFriends = Button:New {
 				right = 140,
 				bottom = 0,
-				width = 220,
-				height = 65,
-				font = Configuration:GetFont(4),
-				caption = i18n("invite_friends"),
+				width = 160,
+				height = 35,
+				padding = {0, 0, 0, 0},
+				font = Configuration:GetFont(2),
+				caption = i18n("invite_friends") .. "   ",
 				classname = "option_button",
 				OnClick = {
 					function()
@@ -800,6 +814,16 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 					end
 				},
 				parent = buttonHolder,
+			}
+
+			local imPartyLink = Image:New {
+				right = 6,
+				y = 4,
+				width = 24,
+				height = 24,
+				keepAspect = true,
+				file = PARTY_LINK,
+				parent = btnInviteFriends,
 			}
 		end
 
@@ -917,33 +941,36 @@ local function SelectPlanet(popupOverlay, planetHandler, planetID, planetData, s
 	end
 
 	local function SizeUpdate()
-		local font = Configuration:GetFont(((planetHandler.height < 760) and 2) or 3)
+		local fluffFont = Configuration:GetFont(((planetHandler.height < 720) and 2) or 3)
+		local descFont = Configuration:GetFont(((planetHandler.height < 720) and 1) or 2) 
 
-		planetDesc.font.size = font.size
+		planetDesc.font.size = descFont.size
 		planetDesc:Invalidate()
-		if planetHandler.height < 660 then
+		if planetHandler.height < 560 then
 			planetDesc._relativeBounds.top = 60
 			fluffGrid:SetVisibility(false)
+
 		elseif planetHandler.height < 820 then
-			planetDesc._relativeBounds.top = "27%"
+			planetDesc._relativeBounds.top = "26%"
 			fluffGrid:SetVisibility(true)
+
 		else
-			planetDesc._relativeBounds.top = "30%"
+			planetDesc._relativeBounds.top = "25%"
 			fluffGrid:SetVisibility(true)
 		end
 		planetDesc:UpdateClientArea(false)
 
 		if planetHandler.height < 600 then
-			subPanel._relativeBounds.right = 390
+			subPanel._relativeBounds.right = 320
 			subPanel._relativeBounds.bottom = "2%"
 		else
-			subPanel._relativeBounds.right = "50%"
+			subPanel._relativeBounds.right = "40%"
 			subPanel._relativeBounds.bottom = "4%"
 		end
 		subPanel:UpdateClientArea(false)
 
 		for i = 1, 4 do
-			fluffLabels[i].font.size = font.size
+			fluffLabels[i].font.size = fluffFont.size
 			fluffLabels[i]:Invalidate()
 		end
 		fluffGrid:Invalidate()
