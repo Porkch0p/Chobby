@@ -91,7 +91,7 @@ function widget:AllowDraw()
 		lastTimer = timer
 		return true
 	end
-	if oldFramesInBuffer < 3 then
+	if (fastRedraw or constantRedrawSeconds) and oldFramesInBuffer < 3 then
 		framesInBuffer = oldFramesInBuffer + 1
 		return true
 	end
