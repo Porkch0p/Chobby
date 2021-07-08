@@ -681,6 +681,35 @@ local function AddNumberSetting(offset, caption, desc, key, default, minVal, max
 	return label, numberInput, offset + ITEM_OFFSET
 end
 
+local function AddLabelSetting(offset, caption, desc, size, tooltip)
+	local Configuration = WG.Chobby.Configuration
+
+	local label = Label:New {
+		x = 20,
+		y = offset + TEXT_OFFSET,
+		width = 350,
+		height = 30,
+		valign = "top",
+		align = "left",
+		caption = caption,
+		tooltip = tooltip,
+		objectOverrideFont = Configuration:GetFont(size),
+	}
+
+	local descLabel = Label:New {
+		x = COMBO_X,
+		y = offset + TEXT_OFFSET,
+		width = COMBO_WIDTH,
+		height = 30,
+		valign = "top",
+		align = "center",
+		caption = desc,
+		tooltip = tooltip,
+		objectOverrideFont = Configuration:GetFont(size),
+	}
+	return label, descLabel, offset + ITEM_OFFSET
+end
+
 local function GetLobbyTabControls()
 	local freezeSettings = true
 
@@ -1658,6 +1687,11 @@ local function PopulateTab(settingPresets, settingOptions, settingsDefault)
 		end
 		children[#children + 1] = label
 		children[#children + 1] = list
+
+		if data.name == "AtiIntelCompatibility_2" then 
+			local glVendor = Platform.gpuVendor:upper()
+			children[#children + 1], children[#children + 2], offset = AddLabelSetting(offset, "Graphics Driver Selected: ", glVendor, 2, true)
+		end
 	end
 
 	return children
